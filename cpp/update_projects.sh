@@ -7,6 +7,7 @@ if [ -z "${ZSTD_DIR}" ]; then
 fi
 
 echo '------------------------------------------------------------'
-premake5 gmake2 --with-zstd-dir=${ZSTD_DIR}
-echo '------------------------------------------------------------'
-premake5 gmake2 --with-zstd-dir=${ZSTD_DIR} --with-emscripten
+cmake -Bbuild-gnumake-debug               -DCMAKE_BUILD_TYPE=Debug
+emcmake cmake -Bbuild-emscripten-debug    -DCMAKE_BUILD_TYPE=Debug
+cmake -Bbuild-gnumake-release             -DCMAKE_BUILD_TYPE=Release
+emcmake cmake -Bbuild-emscripten-release  -DCMAKE_BUILD_TYPE=Release

@@ -18,6 +18,7 @@ CONTAINER_NAME="zstd-emscripten"
 IMAGE_NAME="yoshihitoh/zstd-emscripten"
 
 CONTAINER_ID="$(docker container ls -qa -f name=${CONTAINER_NAME})"
+BUILD_TARGET="release"
 
 # move to root directory
 cd "${ROOT_DIR}"
@@ -41,16 +42,16 @@ docker container run \
     --name "${CONTAINER_NAME}" \
     -v "${CPP_DIR}:/emscripten/src" \
     "${IMAGE_NAME}" \
-    /bin/bash --login /emscripten/src/build-emscripten-release.sh
+    /bin/bash --login "/emscripten/src/build-emscripten-${BUILD_TARGET}.sh"
 
 # copy compiled binindg into js dir
 echo "copying compiled binding into js/lib..."
 docker container cp \
-    ${CONTAINER_NAME}:/emscripten/src/build-emscripten/bin/Release/zstd-codec-binding.js \
+    "${CONTAINER_NAME}:/emscripten/src/build-emscripten-${BUILD_TARGET}/zstd-codec-binding.js" \
     "${JS_DIR}/lib"
 
 docker container cp \
-    ${CONTAINER_NAME}:/emscripten/src/build-emscripten/bin/Release/zstd-codec-binding-wasm.js \
+    "${CONTAINER_NAME}:/emscripten/src/build-emscripten-${BUILD_TARGET}/zstd-codec-binding-wasm.js" \
     "${JS_DIR}/lib"
 
 echo "done!"

@@ -6,8 +6,8 @@ CPP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd ${CPP_DIR} && \
     bash update_projects.sh && \
-    cd build-emscripten && \
-    emmake make -j$(sysctl -n hw.ncpu) config=debug
+    cd build-emscripten-debug && \
+    emmake make -j$(nproc) config=debug
 
 
 # cd "${PROJ_DIR}"
