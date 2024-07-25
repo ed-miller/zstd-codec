@@ -1,4 +1,5 @@
 #include <emscripten/bind.h>
+#include <emscripten/val.h>
 
 #include "../../zstd-codec.h"
 #include "../../zstd-dict.h"
@@ -59,13 +60,13 @@ static val heap_buffer()
 template<typename T>
 static size_t copy_to_vector(Vec<T>& dest, const val& src)
 {
-    const auto length = src["length"].as<unsigned int>();
+    // TODO: use convertJSArrayToNumberVector function after upgrading Emscripten.
+    // The function is available since 2.0.7
+    const size_t length = src["length"].as<size_t>();
+    dest.resize(length);
 
-    val memory = heap_buffer();
-    val memory_view = src["constructor"].new_(memory, reinterpret_cast<uintptr_t>(dest.data()), length);
-
-    dest.reserve(length);
-    memory_view.call<void>("set", src);
+    val memoryView{ typed_memory_view(length, dest.data()) };
+    memoryView.call<void>("set", src);
 
     return length;
 }
@@ -118,13 +119,7 @@ void Dummy()
 
 void CloneToVector(Vec<u8>& dest, val src)
 {
-    const auto length = src["length"].as<unsigned int>();
-    dest.resize(length);
-
-    val memory = heap_buffer();
-    val memory_view = src["constructor"].new_(memory, reinterpret_cast<uintptr_t>(dest.data()), length);
-
-    memory_view.call<void>("set", src);
+    copy_to_vector(dest, src);
 }
 
 
